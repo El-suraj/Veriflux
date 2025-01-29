@@ -19,7 +19,7 @@ actor VerifluxChain {
 
     // Function to add an authorized issuer(should be called by admin)
     public shared(msg) func addAuthorizedIssuer(issuer: Principal) : async (){
-        debug_show("Caller: " # Principal.toText(msg.caller));
+        // debug_show("Caller: " # Principal.toText(msg.caller));
         assert(msg.caller == Principal.fromActor(VerifluxChain));
         authorizedIssuers := Array.append(authorizedIssuers, [issuer]);
     };
