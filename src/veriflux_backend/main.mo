@@ -9,6 +9,7 @@ import Hash "mo:base/Hash";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Sha256 "mo:sha2/Sha256";
+import Debug "mo:base/Debug";
 // Define the actor
 
 actor VerifluxChain {
@@ -18,6 +19,7 @@ actor VerifluxChain {
 
     // Function to add an authorized issuer(should be called by admin)
     public shared(msg) func addAuthorizedIssuer(issuer: Principal) : async (){
+        debug_show("Caller: " # Principal.toText(msg.caller));
         assert(msg.caller == Principal.fromActor(VerifluxChain));
         authorizedIssuers := Array.append(authorizedIssuers, [issuer]);
     };
@@ -40,7 +42,7 @@ actor VerifluxChain {
         write: shared (Text, Blob) -> async { ok: Bool; error_message: Text }
     };
     // Create an instance of the canister
-    let canister: Canister = actor "b77ix-eeaaa-aaaaa-qaada-cai" : Canister;
+    let canister: Canister = actor "by6od-j4aaa-aaaaa-qaadq-cai" : Canister;
 
     // Storage for files (list of tuples containing filename and data)
     // stable var files : List.List<(Text, Blob)> = List.nil();
