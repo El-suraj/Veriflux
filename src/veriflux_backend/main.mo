@@ -91,9 +91,9 @@ actor VerifluxChain {
     };
 
     private func updateCertifiedData() {
-        let CertifiedData = to_candid(Iter.toArray(certificates.vals()));
+        let certifiedData = to_candid(Iter.toArray(certificates.vals()));
         let digest = Sha256.Digest(#sha256);
-        digest.writeBlob(CertifiedData);
+        digest.writeBlob(certifiedData);
         CertifiedData.set(digest.sum());
     };
     // Function to verify a certificate by hash
