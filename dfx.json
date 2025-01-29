@@ -1,0 +1,30 @@
+{
+  "canisters": {
+    "veriflux_backend": {
+      "main": "src/veriflux_backend/main.mo",
+      "type": "motoko"
+    },
+    "veriflux_frontend": {
+      "dependencies": [
+        "veriflux_backend"
+      ],
+      "source": [
+        "src/veriflux_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "veriflux_frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": "mops sources"
+    }
+  },
+  "routes": {
+    "/": "index.html",
+    "/<*>": "index.html"
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
