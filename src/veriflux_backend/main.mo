@@ -42,7 +42,7 @@ actor VerifluxChain {
         write : shared (Text, Blob) -> async { ok : Bool; error_message : Text };
     };
     // Create an instance of the canister
-    let canister : Canister = actor "by6od-j4aaa-aaaaa-qaadq-cai" : Canister;
+    let canister : Canister = actor "b77ix-eeaaa-aaaaa-qaada-cai" : Canister;
 
     // Storage for files (list of tuples containing filename and data)
     // stable var files : List.List<(Text, Blob)> = List.nil();
