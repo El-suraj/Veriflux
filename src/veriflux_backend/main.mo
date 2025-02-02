@@ -1,41 +1,76 @@
 // Import required libraries
-import Text "mo:base/Text";
-import Array "mo:base/Array";
-import Blob "mo:base/Blob";
+// import Debug "mo:base/Debug";
 // import List "mo:base/List";
+// import Nat32 "mo:base/Nat32";
+// import Hash "mo:base/Hash";
+import Blob "mo:base/Blob";
+import Array "mo:base/Array";
+import Text "mo:base/Text";
 import Principal "mo:base/Principal";
 import CertifiedData "mo:base/CertifiedData";
-// import Hash "mo:base/Hash";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Debug "mo:base/Debug";
 import Int "mo:base/Int";
 import Nat8 "mo:base/Nat8";
-import Nat32 "mo:base/Nat32";
 import Sha256 "mo:sha2/Sha256";
-// import Debug "mo:base/Debug";
+
 // Define the actor
 
 actor VerifluxChain {
     //define a list of authorized issuers
     private stable var authorizedIssuers : [Principal] = [Principal.fromText("4sxcy-uffsq-raca2-u5fdh-6u5tg-yz6bl-jgtns-eoctr-u6wen-svor7-xae")];
     private stable var adminPrincipal : Principal = Principal.fromText("4sxcy-uffsq-raca2-u5fdh-6u5tg-yz6bl-jgtns-eoctr-u6wen-svor7-xae");
-    private let certificates = HashMap.HashMap<Text, Certificate>(10, Text.equal, Text.hash);
+    private var certificatesEntries : [(Text, Certificate)] = [];
+    private var certificates = HashMap.HashMap<Text, Certificate>(10, Text.equal, Text.hash);
     // private stable var isInitialized : Bool = false;
-    // Function to add an authorized issuer(should be called by admin)
-    public shared (msg) func addAuthorizedIssuer(issuer : Principal) : async () {
-        // debug_show("Caller: " # Principal.toText(msg.caller));
-        assert (adminPrincipal == msg.caller);
-        authorizedIssuers := Array.append(authorizedIssuers, [issuer]);
+
+    system func preupgrade() {
+        certificatesEntries := Iter.toArray(certificates.entries());
     };
+
+    system func postupgrade() {
+        certificates := HashMap.fromIter<Text, Certificate>(certificatesEntries.vals(), 10, Text.equal, Text.hash);
+        certificatesEntries := [];
+    };
+
+    // Function to add an authorized issuer(should be called by admin)
+    public shared (msg) func addAuthorizedIssuer(issuer : Principal) : async Text {
+        // debug_show("Caller: " # Principal.toText(msg.caller));
+        if (msg.caller != adminPrincipal) {
+            return "Error: Only admin can add authorized issuers";
+        };
+        //check if the issuer is already in the list
+        if (Array.find(authorizedIssuers, func(p : Principal) : Bool { p == issuer }) != null) {
+            return "Error: Issuer already exists";
+        };
+
+        authorizedIssuers := Array.append(authorizedIssuers, [issuer]);
+        Debug.print("New authorized issuer added: " # Principal.toText(issuer));
+        return "New authorized issuer added successfully";
+    };
+
+
     //function to add a new admin (should be called by the current admin)
+ /*
    public shared(msg) func addAdmin(newAdmin : Principal) : async () {
         // After initialization, enforce normal authentication
-        assert (Array.find(authorizedIssuers, func(p : Principal) : Bool { p == msg.caller }) != null);
+        assert (msg.caller == adminPrincipal and Array.find(authorizedIssuers, func(p : Principal) : Bool { p == msg.caller }) != null);
         authorizedIssuers := Array.append(authorizedIssuers, [newAdmin]);
         Debug.print("New admin added: " # Principal.toText(newAdmin));
     
 };
+*/
+
+public shared(msg) func addAdmin(newAdmin : Principal) : async Text {
+    if (msg.caller != adminPrincipal and Array.find(authorizedIssuers, func(p : Principal) : Bool { p == msg.caller }) == null) {
+        return "Error: Only admin or authorized issuers can add new admins";
+    };
+    authorizedIssuers := Array.append(authorizedIssuers, [newAdmin]);
+    Debug.print("New admin added: " # Principal.toText(newAdmin));
+    return "New admin added successfully";
+};
+
 
     // Define a type to represent a certificate
     type Certificate = {
@@ -55,7 +90,7 @@ actor VerifluxChain {
         write : shared (Text, Blob) -> async { ok : Bool; error_message : Text };
     };
     // Create an instance of the canister
-    let canister : Canister = actor "bkyz2-fmaaa-aaaaa-qaaaq-cai" : Canister;
+    // let canister : Canister = actor "bd3sg-teaaa-aaaaa-qaaba-cai" : Canister;
 
     // Function to issue a new certificate
     public shared (msg) func issueCertificate(recipient : Text, program : Text, issuedAt : Int) : async Text {
@@ -85,10 +120,10 @@ actor VerifluxChain {
         // Update the certified data
         updateCertifiedData();
         // Upload the certificate to the canister
-        let filename = "certificate_" # hashHex;
-        let data = Text.encodeUtf8(debug_show (cert));
-        let uploadResult = await uploadFile(filename, data);
-        return "Certificate issued successfully! Hash:" # hashHex # " " # uploadResult;
+        // let filename = "certificate_" # hashHex;
+        // let data = Text.encodeUtf8(debug_show(cert));
+        // let uploadResult = await uploadFile(filename, data);
+        return "Certificate issued successfully! Hash:" # hashHex # " " # hashHex;
 
     };
 
@@ -102,16 +137,16 @@ actor VerifluxChain {
     result
     };
 
-    public func uploadFile(filename : Text, data : Blob) : async Text {
-        //store the file in canister memory
-        let result = await canister.write(filename, data);
-        //check if if the write was successfull
-        if (result.ok) {
-            return "File uploaded successfully: " # result.error_message;
-        } else {
-            return "Error uploading file: " # result.error_message;
-        };
-    };
+    // public func uploadFile(filename : Text, data : Blob) : async Text {
+    //     //store the file in canister memory
+    //     let result = await canister.write(filename, data);
+    //     //check if if the write was successfull
+    //     if (result.ok) {
+    //         return "File uploaded successfully: " # result.error_message;
+    //     } else {
+    //         return "Error uploading file: " # result.error_message;
+    //     };
+    // };
 
     private func updateCertifiedData() {
         let certifiedData = to_candid (Iter.toArray(certificates.vals()));
@@ -134,6 +169,6 @@ actor VerifluxChain {
 
     // Function to list all certificates
     public query func listCertificates() : async [Certificate] {
-        Iter.toArray(certificates.vals());
+        return Iter.toArray(certificates.vals());
     };
 };
