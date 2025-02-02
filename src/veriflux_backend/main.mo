@@ -94,7 +94,9 @@ public shared(msg) func addAdmin(newAdmin : Principal) : async Text {
 
     // Function to issue a new certificate
     public shared (msg) func issueCertificate(recipient : Text, program : Text, issuedAt : Int) : async Text {
-        assert (Array.find(authorizedIssuers, func(p : Principal) : Bool { p == msg.caller }) != null);
+        if (Array.find(authorizedIssuers, func(p : Principal) : Bool { p == msg.caller }) != null){
+            return "Error: Issuer not authorized to issue certificates";
+        };
 
         let issuer =  Principal.toText(msg.caller);
 
