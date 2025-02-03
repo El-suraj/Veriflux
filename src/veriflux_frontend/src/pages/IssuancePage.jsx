@@ -1,7 +1,11 @@
 // src/pages/IssuancePage.js
 import React, { useState } from "react";
 // import axios from "axios";
-import {certificateService} from "../../services/apiService.tsx";
+import { verifluxActor } from "../../../agent.js";
+// import {certificateService} from "../../services/apiService.tsx";
+imp
+
+console.log("alert")
 
 function IssuancePage() {
   const [formData, setFormData] = useState({
@@ -19,7 +23,7 @@ function IssuancePage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await certificateService.issueCertificate(
+      const response = await verifluxActor.issueCertificate(
         formData.issuer,
         formData.recipient,
         formData.program,
@@ -33,7 +37,7 @@ function IssuancePage() {
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center bg-dark-100 text-white p-4">
       <h2>Issue a New Certificate</h2>
       <form onSubmit={handleSubmit}>
         <label>
@@ -77,6 +81,7 @@ function IssuancePage() {
           />
         </label>
         <button type="submit">Issue Certificate</button>
+        
       </form>
     </div>
   );

@@ -93,12 +93,12 @@ public shared(msg) func addAdmin(newAdmin : Principal) : async Text {
     // let canister : Canister = actor "bd3sg-teaaa-aaaaa-qaaba-cai" : Canister;
 
     // Function to issue a new certificate
-    public shared (msg) func issueCertificate(recipient : Text, program : Text, issuedAt : Int) : async Text {
+    public shared (msg) func issueCertificate(issuer: Text,recipient : Text, program : Text, issuedAt : Int) : async Text {
         if (Array.find(authorizedIssuers, func(p : Principal) : Bool { p == msg.caller }) != null){
             return "Error: Issuer not authorized to issue certificates";
         };
 
-        let issuer =  Principal.toText(msg.caller);
+        // let issuer =  Principal.toText(msg.caller);
 
         //generate the hash of the certificate
         let hashInput = issuer # recipient # program # Int.toText(issuedAt);

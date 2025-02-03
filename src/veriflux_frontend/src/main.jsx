@@ -3,9 +3,11 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-    <React.StrictMode>
-    console.log("react appalication started");
-      <App />
-    </React.StrictMode>
-  );
+console.log("react application started");
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
