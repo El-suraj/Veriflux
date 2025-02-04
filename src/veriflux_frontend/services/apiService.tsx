@@ -1,3 +1,4 @@
+// // 
 // import { Actor, HttpAgent, ActorSubclass } from "@dfinity/agent";
 // // import { idlFactory } from "../../declarations/veriflux_backend/veriflux_backend.did";
 // import { canisterId } from "../../declarations/veriflux_backend/index";
@@ -78,3 +79,45 @@
 // // export const verifyCertificate = async (hash) => {
 // //   return await verifluxActor.verifyCertificate(hash);
 // // };
+
+/*
+import { verifluxActor } from "/home/elsuraj/baze-project/veriflux-chain/veriflux/src/agent.js";
+
+type Certificate = {
+  issuer: string;
+  recipient: string;
+  program: string;
+  issuedAt: bigint;
+  hash: string;
+  status: string;
+};
+
+export const certificateService = {
+  issueCertificate: async (issuer: string, recipient: string, program: string, issuedAt: bigint): Promise<string> => {
+    try {
+      return await verifluxActor.issueCertificate(issuer, recipient, program, issuedAt);
+    } catch (error) {
+      console.error("Error issuing certificate:", error);
+      throw error;
+    }
+  },
+  listCertificates: async (): Promise<Certificate[]> => {
+    try {
+      return await verifluxActor.listCertificates();
+    } catch (error) {
+      console.error("Error listing certificates:", error);
+      throw error;
+    }
+  },
+  verifyCertificate: async (hash: string): Promise<{ certificate: Certificate | null; certified: boolean }> => {
+    try {
+      return await verifluxActor.verifyCertificate(hash);
+    } catch (error) {
+      console.error("Error verifying certificate:", error);
+      throw error;
+    }
+  },
+};
+
+export { Certificate };
+*/

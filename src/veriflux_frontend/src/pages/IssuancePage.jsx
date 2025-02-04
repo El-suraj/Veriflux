@@ -3,9 +3,8 @@ import React, { useState } from "react";
 // import axios from "axios";
 import { verifluxActor } from "../../../agent.js";
 // import {certificateService} from "../../services/apiService.tsx";
-imp
 
-console.log("alert")
+console.log("alert");
 
 function IssuancePage() {
   const [formData, setFormData] = useState({
@@ -81,7 +80,6 @@ function IssuancePage() {
           />
         </label>
         <button type="submit">Issue Certificate</button>
-        
       </form>
     </div>
   );
