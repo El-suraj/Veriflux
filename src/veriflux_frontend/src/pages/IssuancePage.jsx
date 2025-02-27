@@ -1,9 +1,12 @@
 // src/pages/IssuancePage.js
-import React, { useState } from "react";
-// import axios from "axios";
-import { verifluxActor } from "../../../agent.js";
+import React, { useCallback, useState } from "react";
 
+import { verifluxActor } from "../../../agent.js";
+import {FileUploader} from "../";
+import ProfilePage from "./"
+import { toast } from "react-toastify";
 // import {certificateService} from "../../services/apiService.tsx";
+
 
 
 function IssuancePage() {
@@ -14,30 +17,60 @@ function IssuancePage() {
     issuedAt: "",
   });
   
+
+  const [file, setFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+ 
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    //input validatiion
+    if(!formData.issuer || !formData.recipient || !formData.program || !formData.issuedAt || !file){
+      toast.error("Please fill all fields");
+      setIsLoading(false);
+      return;
+    }
+
+  
     try {
+      const fileReader = new FileReader();
+      fileReader.onload = async () => {
+        const fileData = fileReader.result;
+        //call the issueCertificate function from the agent.js
       const response = await verifluxActor.issueCertificate(
         formData.issuer,
         formData.recipient,
         formData.program,
         parseInt(new Date(formData.issuedAt).getTime() / 1000), // Convert date to seconds
-  
+        fileData //pass the file data
       );
-      alert("Certificate issued successfully: " + response);
+      toast.success("Certificate issued successfully: " + response);
+      setFormData({
+        issuer: "",
+        recipient: "",
+        program: "",
+        issuedAt: "",
+      });
+      setFile(null); //reset the file
+    };
+    fileReader.readAsDataURL(file); //read the file as data URL
     } catch (error) {
-      alert("Issuance failed: " + error.message);
+      toast.error("Issuance failed: " + error.message);
+      console.error("error issuing certificate", error);
+    }finally{
+      setIsLoading(false);
     }
   };
- 
 
+  
   return (
-    <main className="flex h-screen">
-      <div className="container mx-auto p-4">
+    <main className="flex h-screen justify-center items-center">
+      <div className="container mx-auto p-4 justify-center">
         <h2 className="text-2xl font-bold mb-4">Issue a New Certificate</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <label className="block">
@@ -47,7 +80,8 @@ function IssuancePage() {
               value={formData.issuer}
               onChange={handleChange}
               required
-              className="w-full p-2 border rounded"
+              className="w-auto p-2 border rounded"
+              placeholder="enter the issuer"
             />
           </label>
           <label className="block">
@@ -57,7 +91,8 @@ function IssuancePage() {
               value={formData.recipient}
               onChange={handleChange}
               required
-              className="w-full p-2 border rounded"
+              className="w-auto p-2 border rounded"
+              placeholder="enter the recipient"
             />
           </label>
           <label className="block">
@@ -68,7 +103,8 @@ function IssuancePage() {
               value={formData.program}
               onChange={handleChange}
               required
-              className="w-full p-2 border rounded"
+              className="w-auto p-2 border rounded"
+              placeholder="enter the program"
             />
           </label>
           <label className="block">
@@ -79,8 +115,22 @@ function IssuancePage() {
               value={formData.issuedAt}
               onChange={handleChange}
               required
-              className="w-full p-2 border rounded"
+              className="w-auto p-2 border rounded"
             />
+          </label>
+          <label className="block">
+            Upload File (for NFT):
+            {/* <input
+              type="file"
+              name="file"
+              onChange={(e) => setFile(e.target.files[0])}
+              required
+              className="w-auto p-2 border rounded"
+            /> */}
+            <FileUploader
+                  fieldChange={field.onChange}
+                  mediaUrl={post?.imageUrl}
+                />
           </label>
           <button
             type="submit"

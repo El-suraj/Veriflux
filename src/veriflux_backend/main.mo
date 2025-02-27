@@ -50,27 +50,25 @@ actor VerifluxChain {
         return "New authorized issuer added successfully";
     };
 
-
     //function to add a new admin (should be called by the current admin)
- /*
+    /*
    public shared(msg) func addAdmin(newAdmin : Principal) : async () {
         // After initialization, enforce normal authentication
         assert (msg.caller == adminPrincipal and Array.find(authorizedIssuers, func(p : Principal) : Bool { p == msg.caller }) != null);
         authorizedIssuers := Array.append(authorizedIssuers, [newAdmin]);
         Debug.print("New admin added: " # Principal.toText(newAdmin));
-    
+
 };
 */
 
-public shared(msg) func addAdmin(newAdmin : Principal) : async Text {
-    if (msg.caller != adminPrincipal and Array.find(authorizedIssuers, func(p : Principal) : Bool { p == msg.caller }) == null) {
-        return "Error: Only admin or authorized issuers can add new admins";
+    public shared (msg) func addAdmin(newAdmin : Principal) : async Text {
+        if (msg.caller != adminPrincipal and Array.find(authorizedIssuers, func(p : Principal) : Bool { p == msg.caller }) == null) {
+            return "Error: Only admin or authorized issuers can add new admins";
+        };
+        authorizedIssuers := Array.append(authorizedIssuers, [newAdmin]);
+        Debug.print("New admin added: " # Principal.toText(newAdmin));
+        return "New admin added successfully";
     };
-    authorizedIssuers := Array.append(authorizedIssuers, [newAdmin]);
-    Debug.print("New admin added: " # Principal.toText(newAdmin));
-    return "New admin added successfully";
-};
-
 
     // Define a type to represent a certificate
     type Certificate = {
@@ -93,16 +91,22 @@ public shared(msg) func addAdmin(newAdmin : Principal) : async Text {
     // let canister : Canister = actor "bd3sg-teaaa-aaaaa-qaaba-cai" : Canister;
 
     // Function to issue a new certificate
-    public shared (msg) func issueCertificate(issuer: Text,recipient : Text, program : Text, issuedAt : Int) : async Text
-    
-     {
-          Debug.print("Caller: " # Principal.toText(msg.caller));
-    Debug.print("Issuer: " # issuer);
-    Debug.print("Recipient: " # recipient);
-    Debug.print("Program: " # program);
-    Debug.print("IssuedAt: " # Int.toText(issuedAt));
+    public shared (msg) func issueCertificate(
+        issuer : Text,
+        recipient : Text,
+        program : Text,
+        issuedAt : Int,
+        fileData : Text,
+    ) : async Text
 
-        if (Array.find(authorizedIssuers, func(p : Principal) : Bool { p == msg.caller }) != null){
+    {
+        Debug.print("Caller: " # Principal.toText(msg.caller));
+        Debug.print("Issuer: " # issuer);
+        Debug.print("Recipient: " # recipient);
+        Debug.print("Program: " # program);
+        Debug.print("IssuedAt: " # Int.toText(issuedAt));
+
+        if (Array.find(authorizedIssuers, func(p : Principal) : Bool { p == msg.caller }) != null) {
             Debug.print("Error: Issuer not authorized");
             return "Error: Issuer not authorized to issue certificates";
         };
@@ -124,6 +128,7 @@ public shared(msg) func addAdmin(newAdmin : Principal) : async Text {
             issuedAt = issuedAt;
             hash = hashHex;
             status = "Valid";
+            file = fileData;
         };
 
         // Add certificate to the list
@@ -140,24 +145,13 @@ public shared(msg) func addAdmin(newAdmin : Principal) : async Text {
 
     //helper function to convert a blob to hexadecimal string
     private func blobToHex(blob : Blob) : Text {
-         let hex = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
-    var result = "";
-    for (byte in Blob.toArray(blob).vals()) {
-        result #= hex[Nat8.toNat(byte) / 16] # hex[Nat8.toNat(byte) % 16];
+        let hex = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
+        var result = "";
+        for (byte in Blob.toArray(blob).vals()) {
+            result #= hex[Nat8.toNat(byte) / 16] # hex[Nat8.toNat(byte) % 16];
+        };
+        result;
     };
-    result
-    };
-
-    // public func uploadFile(filename : Text, data : Blob) : async Text {
-    //     //store the file in canister memory
-    //     let result = await canister.write(filename, data);
-    //     //check if if the write was successfull
-    //     if (result.ok) {
-    //         return "File uploaded successfully: " # result.error_message;
-    //     } else {
-    //         return "Error uploading file: " # result.error_message;
-    //     };
-    // };
 
     private func updateCertifiedData() {
         let certifiedData = to_candid (Iter.toArray(certificates.vals()));
