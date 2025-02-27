@@ -93,8 +93,17 @@ public shared(msg) func addAdmin(newAdmin : Principal) : async Text {
     // let canister : Canister = actor "bd3sg-teaaa-aaaaa-qaaba-cai" : Canister;
 
     // Function to issue a new certificate
-    public shared (msg) func issueCertificate(issuer: Text,recipient : Text, program : Text, issuedAt : Int) : async Text {
+    public shared (msg) func issueCertificate(issuer: Text,recipient : Text, program : Text, issuedAt : Int) : async Text
+    
+     {
+          Debug.print("Caller: " # Principal.toText(msg.caller));
+    Debug.print("Issuer: " # issuer);
+    Debug.print("Recipient: " # recipient);
+    Debug.print("Program: " # program);
+    Debug.print("IssuedAt: " # Int.toText(issuedAt));
+
         if (Array.find(authorizedIssuers, func(p : Principal) : Bool { p == msg.caller }) != null){
+            Debug.print("Error: Issuer not authorized");
             return "Error: Issuer not authorized to issue certificates";
         };
 

@@ -27,7 +27,7 @@ function VerificationPage() {
       <form onSubmit={handleVerify}>
         <label>
           Certificate Hash:
-          <input type="text" /*value={hash}*/ onChange={handleChange} placeholder="0xef25tgvdcg.........cai" required />
+          <input type="text" value={hash} onChange={handleChange} placeholder="0xef25tgvdcg.........cai" required />
         </label>
         <button type="submit">Verify</button>
       </form>
