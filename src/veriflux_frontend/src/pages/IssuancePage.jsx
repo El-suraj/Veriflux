@@ -4,6 +4,7 @@ import React, { useCallback, useState } from "react";
 import { verifluxActor } from "../../../agent.js";
 import FileUploader from "../components/FileUploader.jsx";
 import { toast } from "react-toastify";
+import Navbar from "../components/Navbar.jsx";
 // import {certificateService} from "../../services/apiService.tsx";
 
 function IssuancePage() {
@@ -68,7 +69,10 @@ function IssuancePage() {
   };
 
   return (
-    <main className="flex h-screen justify-center items-center bg-[url(./public)]">
+    <main className="flex h-screen justify-center items-center bg-[url(/bg-issuance.jpg)]">
+      <div>
+        <Navbar/>
+      </div>
       <div className="container w-auto mx-auto p-4 items-center bg-blue-200 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold mb-4">Issue a New Certificate</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
