@@ -1,5 +1,9 @@
-import * as React from "react";
+import React from "react";
 import {Swiper, SwiperSlide} from "swiper/react";
+// import "swiper/css";
+// import "swiper/css/pagination";
+// import "swiper/css/autoplay";
+import {Pagination, Autoplay} from "swiper/modules";
 
 
 const Carousel = () => {
