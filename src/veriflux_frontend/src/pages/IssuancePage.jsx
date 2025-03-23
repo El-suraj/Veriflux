@@ -1,10 +1,10 @@
 // src/pages/IssuancePage.js
 import React, { useCallback, useState } from "react";
-
 import { verifluxActor } from "../../../agent.js";
 import FileUploader from "../components/FileUploader.jsx";
 import { toast } from "react-toastify";
 import Navbar from "../components/Navbar.jsx";
+import Footer from "../components/Footer.jsx";
 // import {certificateService} from "../../services/apiService.tsx";
 
 function IssuancePage() {
@@ -64,15 +64,14 @@ function IssuancePage() {
       toast.error("Issuance failed: " + error.message);
       console.error("error issuing certificate", error);
     } finally {
-      setIsLoading(false);
+      setIsLoading (false);
     }
   };
 
   return (
-    <main className="flex h-screen justify-center items-center bg-[url(/bg-issuance.jpg)]">
-      <div>
+    <div className="min-h-screen flex flex-col bg-[url(/bg-issuance.jpg)] bg-cover bg-center">
         <Navbar/>
-      </div>
+        <main className="flex-grow flex justify-center items-center p-4">
       <div className="container w-auto mx-auto p-4 items-center bg-blue-200 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold mb-4">Issue a New Certificate</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -131,19 +130,22 @@ function IssuancePage() {
               className="w-auto p-2 border rounded"
             /> */}
             <FileUploader
-              // fieldChange={field.onChange}
+              fieldChange={(file) => setFile(file)}
               mediaUrl={file?.imageUrl}
             />
           </label>
           <button
             type="submit"
             className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 "
+            disabled={isLoading}
           >
-            Issue Certificate
+            {isLoading ? " Issuing...." : "Issue Certificate"}
           </button>
         </form>
       </div>
     </main>
+      <Footer />
+    </div>
   );
 }
 
